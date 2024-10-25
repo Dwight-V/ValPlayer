@@ -1,16 +1,26 @@
 package com.example.ValPlayer;
 
+import static androidx.core.app.ActivityCompat.startActivityForResult;
+
+import android.content.ContentUris;
 import android.content.Context;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 // From https://github.com/codepath/android_guides/wiki/Using-the-RecyclerView
@@ -18,10 +28,12 @@ public class AudioFileAdapter extends RecyclerView.Adapter<AudioFileAdapter.View
     // region ViewHolder
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         // Your holder should contain a member variable
         // for any view that will be set as you render a row
         public TextView txtArtist, txtSong, txtPath, txtTime;
+
+        private MediaPlayer mp;
 
         // We also create a constructor that accepts the entire item row
         // and does the view lookups to find each subview
@@ -34,6 +46,28 @@ public class AudioFileAdapter extends RecyclerView.Adapter<AudioFileAdapter.View
             txtSong = itemView.findViewById(R.id.textview_row_item_song);
             txtPath = itemView.findViewById(R.id.textview_row_item_path);
             txtTime = itemView.findViewById(R.id.textview_row_item_time);
+            itemView.setOnClickListener(this);
+        }
+
+        // https://github.com/codepath/android_guides/wiki/Using-the-RecyclerView#attaching-click-handlers-to-items
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition(); // gets item position
+//            if (position != RecyclerView.NO_POSITION) { // Check if an item was deleted, but the user clicked it before the UI removed it
+//                AudioFile selectedFile = allAudio.get(position);
+//                // We can access the data within the views
+//                Toast.makeText(itemView.getContext(), txtArtist.getText(), Toast.LENGTH_SHORT).show();
+//            }
+//            Toast.makeText(itemView.getContext(), txtSong.getText(), Toast.LENGTH_SHORT).show();
+
+
+            // mp.stop() doesn't work. I assume I'll have to pull out mp into the MainActivity.java
+            try {
+                mp.stop();
+            } catch (Exception e) {
+            }
+            MediaPlayer mp = MediaPlayer.create(itemView.getContext(), ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, allAudio.get(position).getId()));
+            mp.start();
         }
     }
     // endregion

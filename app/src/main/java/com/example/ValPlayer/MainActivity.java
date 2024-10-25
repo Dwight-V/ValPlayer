@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,6 +23,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
@@ -62,11 +64,23 @@ public class MainActivity extends AppCompatActivity {
 
         rvDirectory = findViewById(R.id.recycleview_directory);
 
+        // https://github.com/codepath/android_guides/wiki/Using-the-RecyclerView#decorations
+        rvDirectory.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+
+
+
+
+        // Main
         if (!checkStoragePermissions()) {
             requestForStoragePermissions();
         }
 
         addAudioFilesToRecycle();
+    }
+
+    // Updates both *_current_song.xml files.
+    public void setCurrentSong(AudioFile audioFile) {
 
     }
 
