@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
+import java.util.StringJoiner;
 
 // From https://github.com/codepath/android_guides/wiki/Using-the-RecyclerView
 public class AudioFileAdapter extends RecyclerView.Adapter<AudioFileAdapter.ViewHolder> {
@@ -71,7 +72,14 @@ public class AudioFileAdapter extends RecyclerView.Adapter<AudioFileAdapter.View
         holder.txtArtist.setText(audioFile.getArtist());
         holder.txtSong.setText(audioFile.getSong());
         holder.txtTime.setText(audioFile.getFormattedDuration());
-        holder.txtPath.setText(audioFile.getPath());
+
+        String path = audioFile.getPath();
+        try {
+            String[] pathDirs = path.split("/");
+            holder.txtPath.setText(String.format("/%s/%s/%s", pathDirs[pathDirs.length - 4], pathDirs[pathDirs.length - 3], pathDirs[pathDirs.length - 2]));
+        } catch (Exception e) {
+            holder.txtPath.setText(path);
+        }
     }
 
     // Returns the total count of items in the list

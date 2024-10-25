@@ -49,6 +49,6 @@ public class AudioFile {
 
     public String getFormattedDuration() {
         long durInSec = duration / 1000;
-        return String.format("%d:%d:%02d", durInSec / 3600, durInSec % 3600 / 60, durInSec % 60);
+        return String.format("%d:%02d:%02d", durInSec / 3600, durInSec % 3600 / 60, durInSec % 60);
     }
 }
