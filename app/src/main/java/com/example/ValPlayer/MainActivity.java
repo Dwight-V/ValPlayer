@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,10 +34,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int STORAGE_PERMISSION_CODE = 23;
 
     private RecyclerView rvDirectory;
 
+    private MediaPlayer mp;
+
+    private AudioFileAdapter.OnItemClickListener rvDirectoryItemClickListener;
+
+    private static final int STORAGE_PERMISSION_CODE = 23;
     private ActivityResultLauncher<Intent> storageActivityResultLauncher =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     new ActivityResultCallback<ActivityResult>(){
@@ -68,8 +74,22 @@ public class MainActivity extends AppCompatActivity {
         rvDirectory.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
 
 
+        // Needs this janky setup so MainActivity.java has access to the clicked AudioFile from within AudioFileAdapter.java.
+        // From https://stackoverflow.com/a/49969478
+        rvDirectoryItemClickListener = new AudioFileAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(AudioFile item) {
+//                Toast.makeText(MainActivity.this, item.getSong(), Toast.LENGTH_SHORT).show();
+                try {
+                    mp.stop();
+                } catch (Exception e) {
 
+                }
 
+                mp = MediaPlayer.create(getApplicationContext(), ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.getId()));
+                mp.start();
+            }
+        };
 
         // Main
         if (!checkStoragePermissions()) {
@@ -139,8 +159,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-        AudioFileAdapter adapter = new AudioFileAdapter(arrListAudio);
+        AudioFileAdapter adapter = new AudioFileAdapter(arrListAudio, rvDirectoryItemClickListener);
         rvDirectory.setAdapter(adapter);
         rvDirectory.setLayoutManager(new LinearLayoutManager(this));
     }
