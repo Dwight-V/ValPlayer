@@ -22,13 +22,18 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -63,12 +68,36 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
+
+    // region current_song variables
+    private TextView txtArtist, txtSong, txtSongEnd;
+    private Chronometer txtSongStart;
+    private ImageView imgMedia;
+    // endregion
+
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         rvDirectory = findViewById(R.id.recycleview_directory);
+
+        // Variables for current_song
+        txtArtist = findViewById(R.id.textview_artist);
+        txtSong = findViewById(R.id.textview_song);
+        txtSongStart = findViewById(R.id.textview_song_start);
+        txtSongEnd = findViewById(R.id.textview_song_end);
+        imgMedia = findViewById(R.id.imageview_media);
+
+
+
+
+
+
 
         // https://github.com/codepath/android_guides/wiki/Using-the-RecyclerView#decorations
         rvDirectory.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
@@ -88,8 +117,19 @@ public class MainActivity extends AppCompatActivity {
 
                 mp = MediaPlayer.create(getApplicationContext(), ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, item.getId()));
                 mp.start();
+
+                setCurrentSong(item);
             }
         };
+
+
+
+
+
+
+
+
+
 
         // Main
         if (!checkStoragePermissions()) {
@@ -101,6 +141,41 @@ public class MainActivity extends AppCompatActivity {
 
     // Updates both *_current_song.xml files.
     public void setCurrentSong(AudioFile audioFile) {
+        txtSong.setText(audioFile.getSong());
+        txtArtist.setText(audioFile.getArtist());
+        txtSongEnd.setText(audioFile.getFormattedDuration());
+
+        // Resets the chronometer to the current time, i.e. 0:00.
+        txtSongStart.setBase(SystemClock.elapsedRealtime());
+
+        // From https://stackoverflow.com/a/17183740
+        txtSongStart.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                long elapsedMillis = SystemClock.elapsedRealtime() - chronometer.getBase();
+
+                // Calculate hours, minutes, and seconds
+                int hours = (int) (elapsedMillis / 3600000);
+                int minutes = (int) (elapsedMillis % 3600000) / 60000;
+                int seconds = (int) (elapsedMillis % 60000) / 1000;
+
+                // Format as HH:MM:SS
+                String time = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+                chronometer.setText(time);
+
+                // Meaning the file is finished running
+                if (!mp.isPlaying()) {
+                    txtSongStart.stop();
+                    txtSongStart.setText(audioFile.getFormattedDuration());
+                    autoplayNextSong();
+                }
+            }
+        });
+
+        txtSongStart.start();
+    }
+
+    public void autoplayNextSong() {
 
     }
 

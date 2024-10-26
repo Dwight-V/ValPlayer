@@ -22,6 +22,15 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="song name"
+            android:textSize="@dimen/text_size_tertiary"
+            android:textAlignment="center"
+            android:id="@+id/textview_song"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="artist"
             android:textSize="@dimen/text_size_tertiary"
             android:textAlignment="center"
@@ -29,14 +38,6 @@
             android:textColor="@color/light_gray"
             />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="song name"
-            android:textSize="@dimen/text_size_tertiary"
-            android:textAlignment="center"
-            android:id="@+id/textview_song_name"
-            />
     </LinearLayout>
 
     <!--  Time Layout  -->
@@ -46,10 +47,9 @@
         android:layout_gravity="center"
         android:layout_weight="4">
 
-        <TextView
+        <Chronometer
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="0:00"
             android:textSize="@dimen/text_size_tertiary"
             android:textAlignment="center"
             android:id="@+id/textview_song_start"
